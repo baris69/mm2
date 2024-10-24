@@ -1,5 +1,3 @@
--- Autofarming Script: Fly to nearest coin in CoinContainer
-
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
@@ -8,15 +6,16 @@ local coinContainer = game.Workspace:WaitForChild("CoinContainer")
 -- Adjust flight speed
 local flightSpeed = 100
 
--- Function to get the nearest coin
+-- Function to get the nearest "Coin_Server"
 local function getNearestCoin()
     local nearestCoin = nil
     local shortestDistance = math.huge
     
-    -- Loop through all coins in CoinContainer
+    -- Loop through all objects in CoinContainer
     for _, coin in pairs(coinContainer:GetChildren()) do
-        if coin:IsA("BasePart") then
-            -- Calculate distance between player and coin
+        -- Check if the object is named "Coin_Server"
+        if coin:IsA("BasePart") and coin.Name == "Coin_Server" then
+            -- Calculate distance between player and the coin
             local distance = (humanoidRootPart.Position - coin.Position).Magnitude
             if distance < shortestDistance then
                 shortestDistance = distance
@@ -45,7 +44,7 @@ local function flyToCoin(coin)
     end
 end
 
--- Main loop to continuously find and fly to the nearest coin
+-- Main loop to continuously find and fly to the nearest "Coin_Server"
 while wait(1) do
     local nearestCoin = getNearestCoin()
     
