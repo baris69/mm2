@@ -1,0 +1,90 @@
+wait(0.5)
+local ba = Instance.new("ScreenGui")
+local ca = Instance.new("TextLabel")
+local da = Instance.new("Frame")
+local ab = Instance.new("TextLabel")
+
+-- Parent GUI to CoreGui for visibility and ensure it's draggable on mobile
+ba.Parent = game.CoreGui
+ba.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ba.ResetOnSpawn = false
+
+-- Main Title Bar
+ca.Parent = ba
+ca.Active = true
+ca.BackgroundColor3 = Color3.new(0.12, 0.12, 0.12)
+ca.Draggable = true
+ca.Position = UDim2.new(0.3, 0, 0.1, 0)
+ca.Size = UDim2.new(0, 400, 0, 50)
+ca.Font = Enum.Font.SourceSansBold
+ca.Text = "Anti-AFK System"
+ca.TextColor3 = Color3.new(1, 1, 1)
+ca.TextSize = 24
+ca.TextStrokeTransparency = 0.8
+ca.TextStrokeColor3 = Color3.new(0, 0, 0)
+
+-- Main Frame for Status Display
+da.Parent = ca
+da.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+da.Position = UDim2.new(0, 0, 1, 0)
+da.Size = UDim2.new(0, 400, 0, 100)
+da.BorderSizePixel = 0
+
+-- Status Label
+ab.Parent = da
+ab.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+ab.Position = UDim2.new(0, 0, 0.3, 0)
+ab.Size = UDim2.new(0, 400, 0, 50)
+ab.Font = Enum.Font.GothamBold
+ab.Text = "Status: Active"
+ab.TextColor3 = Color3.new(0.4, 1, 0.4)
+ab.TextSize = 22
+
+-- Anti-AFK Functionality
+local bb = game:GetService('VirtualUser')
+game:GetService('Players').LocalPlayer.Idled:connect(function()
+    bb:CaptureController()
+    bb:ClickButton2(Vector2.new())
+
+    -- Change the status temporarily
+    ab.Text = "You're all set, no worries!"
+    ab.TextColor3 = Color3.new(1, 0.8, 0.2)
+
+    -- Revert to normal status after a delay
+    wait(2)
+    ab.Text = "Status: Active"
+    ab.TextColor3 = Color3.new(0.4, 1, 0.4)
+end)
+
+-- Mobile Touch Support (Draggable GUI for Mobile)
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+    local delta = input.Position - dragStart
+    ba.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+ca.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = ba.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+ca.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        update(input)
+    end
+end)
